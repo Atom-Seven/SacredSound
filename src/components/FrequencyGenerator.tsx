@@ -1,5 +1,5 @@
 import React from 'react';
-import { Play, Pause, Volume2, Waves } from 'lucide-react';
+import { Play, Pause, Volume2, Waves, Zap, Music, Wind } from 'lucide-react';
 
 interface FrequencyGeneratorProps {
   currentFrequency: number;
@@ -20,6 +20,17 @@ const FrequencyGenerator: React.FC<FrequencyGeneratorProps> = ({
   setVolume,
   playFrequency,
 }) => {
+  const [schumannPulse, setSchumannPulse] = React.useState(false);
+  const [classicalVolume, setClassicalVolume] = React.useState(0.3);
+  const [atmosphericVolume, setAtmosphericVolume] = React.useState(0.2);
+  const [selectedMusicalBed, setSelectedMusicalBed] = React.useState('satie');
+
+  const musicalBeds = [
+    { id: 'satie', name: 'Erik Satie', description: 'Minimalist & contemplative' },
+    { id: 'bach', name: 'J.S. Bach', description: 'Mathematical harmony' },
+    { id: 'debussy', name: 'Claude Debussy', description: 'Impressionistic & flowing' },
+  ];
+
   const presetFrequencies = [
     { freq: 7.83, name: 'Schumann Resonance', desc: 'Earth\'s heartbeat' },
     { freq: 40, name: 'Gamma Focus', desc: 'Enhanced concentration' },
@@ -77,21 +88,121 @@ const FrequencyGenerator: React.FC<FrequencyGeneratorProps> = ({
         </div>
       </div>
 
-      {/* Volume Control */}
+      {/* Schumann Pulse Toggle */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/10">
+          <div className="flex items-center space-x-3">
+            <Zap className={`w-5 h-5 ${schumannPulse ? 'text-green-400' : 'text-gray-400'}`} />
+            <div>
+              <h3 className="text-white font-medium">Schumann Pulse</h3>
+              <p className="text-blue-200 text-sm">7.83 Hz Earth resonance</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setSchumannPulse(!schumannPulse)}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+              schumannPulse ? 'bg-green-500' : 'bg-gray-600'
+            }`}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                schumannPulse ? 'translate-x-6' : 'translate-x-1'
+              }`}
+            />
+          </button>
+        </div>
+        {schumannPulse && (
+          <div className="mt-2 p-3 bg-green-500/10 border border-green-400/30 rounded-xl">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-green-400 text-sm">Schumann pulse active - enhancing grounding</span>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Musical Bed Selection */}
       <div className="mb-8">
         <label className="block text-white text-sm mb-4 flex items-center space-x-2">
-          <Volume2 className="w-4 h-4" />
-          <span>Volume</span>
+          <Music className="w-4 h-4" />
+          <span>Musical Bed</span>
         </label>
-        <input
-          type="range"
-          min="0"
-          max="1"
-          step="0.01"
-          value={volume}
-          onChange={(e) => setVolume(parseFloat(e.target.value))}
-          className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider"
-        />
+        <select
+          value={selectedMusicalBed}
+          onChange={(e) => setSelectedMusicalBed(e.target.value)}
+          className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+          {musicalBeds.map((bed) => (
+            <option key={bed.id} value={bed.id} className="bg-slate-800 text-white">
+              {bed.name} - {bed.description}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Audio Layer Controls */}
+      <div className="mb-8 space-y-6">
+        <h3 className="text-white text-lg mb-4">Audio Layers</h3>
+        
+        {/* Classical Music Volume */}
+        <div>
+          <label className="block text-white text-sm mb-3 flex items-center space-x-2">
+            <Music className="w-4 h-4 text-blue-400" />
+            <span>Classical Music</span>
+            <span className="text-blue-300 text-xs">({musicalBeds.find(b => b.id === selectedMusicalBed)?.name})</span>
+          </label>
+          <div className="flex items-center space-x-4">
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={classicalVolume}
+              onChange={(e) => setClassicalVolume(parseFloat(e.target.value))}
+              className="flex-1 h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider"
+            />
+            <span className="text-blue-300 text-sm w-12">{Math.round(classicalVolume * 100)}%</span>
+          </div>
+        </div>
+
+        {/* Atmospheric Texture Volume */}
+        <div>
+          <label className="block text-white text-sm mb-3 flex items-center space-x-2">
+            <Wind className="w-4 h-4 text-purple-400" />
+            <span>Atmospheric Texture</span>
+          </label>
+          <div className="flex items-center space-x-4">
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={atmosphericVolume}
+              onChange={(e) => setAtmosphericVolume(parseFloat(e.target.value))}
+              className="flex-1 h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider"
+            />
+            <span className="text-blue-300 text-sm w-12">{Math.round(atmosphericVolume * 100)}%</span>
+          </div>
+        </div>
+      </div>
+      {/* Volume Control */}
+      <div className="mb-8">
+        <label className="block text-white text-sm mb-3 flex items-center space-x-2">
+          <Volume2 className="w-4 h-4" />
+          <span>Master Volume</span>
+        </label>
+        <div className="flex items-center space-x-4">
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            value={volume}
+            onChange={(e) => setVolume(parseFloat(e.target.value))}
+            className="flex-1 h-2 bg-white/20 rounded-lg appearance-none cursor-pointer slider"
+          />
+          <span className="text-blue-300 text-sm w-12">{Math.round(volume * 100)}%</span>
+        </div>
       </div>
 
       {/* Play/Pause Button */}
@@ -103,6 +214,39 @@ const FrequencyGenerator: React.FC<FrequencyGeneratorProps> = ({
         <span>{isPlaying ? 'Pause' : 'Play'} Frequency</span>
       </button>
 
+      {/* Active Layers Display */}
+      {isPlaying && (
+        <div className="mt-6 p-4 bg-white/5 rounded-2xl border border-white/10">
+          <h4 className="text-white font-medium mb-3">Active Audio Layers</h4>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-blue-200 text-sm">Healing Frequency</span>
+              <span className="text-green-400 text-sm">{currentFrequency} Hz</span>
+            </div>
+            {schumannPulse && (
+              <div className="flex items-center justify-between">
+                <span className="text-blue-200 text-sm">Schumann Pulse</span>
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                  <span className="text-green-400 text-sm">7.83 Hz</span>
+                </div>
+              </div>
+            )}
+            {classicalVolume > 0 && (
+              <div className="flex items-center justify-between">
+                <span className="text-blue-200 text-sm">Classical Music</span>
+                <span className="text-blue-400 text-sm">{Math.round(classicalVolume * 100)}%</span>
+              </div>
+            )}
+            {atmosphericVolume > 0 && (
+              <div className="flex items-center justify-between">
+                <span className="text-blue-200 text-sm">Atmospheric Texture</span>
+                <span className="text-purple-400 text-sm">{Math.round(atmosphericVolume * 100)}%</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       {/* Preset Frequencies */}
       <div className="mt-8">
         <h3 className="text-white text-lg mb-4">Sacred Frequencies</h3>
